@@ -788,8 +788,8 @@ class PromptDataset(Dataset):
 
 
 def tokenize_prompt(tokenizer, prompt, text_encoder):
-    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False)
-    embeds = compel(prompt, output_hidden_states=True)
+    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False, requires_pooled= True)
+    embeds = compel(prompt)
 
     return embeds
 
@@ -807,11 +807,8 @@ def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None):
             text_input_ids = text_input_ids_list[i]
 
         # We are only ALWAYS interested in the pooled output of the final text encoder
-        pooled_prompt_embeds = prompt_embeds[0]
-        prompt_embeds = prompt_embeds.hidden_states[-2]
-        bs_embed, seq_len, _ = prompt_embeds.shape
-        prompt_embeds = prompt_embeds.view(bs_embed, seq_len, -1)
-        prompt_embeds_list.append(prompt_embeds)
+        pooled_prompt_embeds = prompt_embeds[1]
+        prompt_embeds_list.append(pooled_prompt_embeds)
 
     prompt_embeds = torch.concat(prompt_embeds_list, dim=-1)
     pooled_prompt_embeds = pooled_prompt_embeds.view(bs_embed, -1)
