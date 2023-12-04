@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-
+from compel import Compel
 import argparse
 import gc
 import itertools
@@ -787,16 +787,11 @@ class PromptDataset(Dataset):
         return example
 
 
-def tokenize_prompt(tokenizer, prompt):
-    text_inputs = tokenizer(
-        prompt,
-        padding="max_length",
-        max_length=tokenizer.model_max_length,
-        truncation=True,
-        return_tensors="pt",
-    )
-    text_input_ids = text_inputs.input_ids
-    return text_input_ids
+def tokenize_prompt(tokenizer, prompt, text_encoder):
+    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder)
+    embeds = compel.build_conditioning_tensor(prompt)
+
+    return embeds
 
 
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
@@ -806,15 +801,10 @@ def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None):
     for i, text_encoder in enumerate(text_encoders):
         if tokenizers is not None:
             tokenizer = tokenizers[i]
-            text_input_ids = tokenize_prompt(tokenizer, prompt)
+            prompt_embeds = tokenize_prompt(tokenizer, prompt, text_encoder)
         else:
             assert text_input_ids_list is not None
             text_input_ids = text_input_ids_list[i]
-
-        prompt_embeds = text_encoder(
-            text_input_ids.to(text_encoder.device),
-            output_hidden_states=True,
-        )
 
         # We are only ALWAYS interested in the pooled output of the final text encoder
         pooled_prompt_embeds = prompt_embeds[0]
