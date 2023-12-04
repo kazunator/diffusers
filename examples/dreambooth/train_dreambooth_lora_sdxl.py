@@ -786,15 +786,13 @@ class PromptDataset(Dataset):
         example["index"] = index
         return example
 
-
 def tokenize_prompt(tokenizers, prompt, text_encoders):
-   compel = Compel(tokenizer=[tokenizers[0], tokenizers[1]] , 
+    compel = Compel(tokenizer=[tokenizers[0], tokenizers[1]] , 
                 text_encoder=[text_encoders[0], text_encoders[1]], 
                 returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, 
                 requires_pooled=[False, True],
                truncate_long_prompts=False)
     embed, pooled = compel(prompt)
-
     return embed, pooled
 
 
