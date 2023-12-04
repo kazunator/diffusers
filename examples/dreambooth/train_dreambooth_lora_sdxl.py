@@ -787,8 +787,12 @@ class PromptDataset(Dataset):
         return example
 
 
-def tokenize_prompt(tokenizer, prompt, text_encoder):
-    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False, returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, requires_pooled=[False, True])
+def tokenize_prompt(tokenizers, prompt, text_encoders):
+   compel = Compel(tokenizer=[tokenizers[0], tokenizers[1]] , 
+                text_encoder=[text_encoders[0], text_encoders[1]], 
+                returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, 
+                requires_pooled=[False, True],
+               truncate_long_prompts=False)
     embed, pooled = compel(prompt)
 
     return embed, pooled
@@ -796,24 +800,8 @@ def tokenize_prompt(tokenizer, prompt, text_encoder):
 
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
 def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None):
-    prompt_embeds_list = []
-    pooled_prompt_embeds_list = []
     
-    for i, text_encoder in enumerate(text_encoders):
-        if tokenizers is not None:
-            tokenizer = tokenizers[i]
-            prompt_embeds, pooled = tokenize_prompt(tokenizer, prompt, text_encoder)
-        else:
-            assert text_input_ids_list is not None
-            text_input_ids = text_input_ids_list[i]
-
-        # We are only ALWAYS interested in the pooled output of the final text encoder
-        pooled_prompt_embeds_list.append(prompt_embeds[1])
-        prompt_embeds_list.append(prompt_embeds)
-
-    prompt_embeds = torch.concat(prompt_embeds_list, dim=-1)
-    pooled_prompt_embeds = torch.concat(pooled_prompt_embeds_list, dim=-1)
-    return prompt_embeds, pooled_prompt_embeds
+    return tokenize_prompt(tokenizers, prompt, text_encoders)
 
 
 def main(args):
