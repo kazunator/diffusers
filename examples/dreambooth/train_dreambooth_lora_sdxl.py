@@ -788,10 +788,10 @@ class PromptDataset(Dataset):
 
 
 def tokenize_prompt(tokenizer, prompt, text_encoder):
-    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False)
-    embed = compel(prompt)
+    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False, requires_pooled= True)
+    embed, pooled = compel(prompt)
 
-    return embed
+    return embed, pooled
 
 
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
@@ -802,7 +802,7 @@ def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None):
     for i, text_encoder in enumerate(text_encoders):
         if tokenizers is not None:
             tokenizer = tokenizers[i]
-            prompt_embeds = tokenize_prompt(tokenizer, prompt, text_encoder)
+            prompt_embeds, pooled = tokenize_prompt(tokenizer, prompt, text_encoder)
         else:
             assert text_input_ids_list is not None
             text_input_ids = text_input_ids_list[i]
