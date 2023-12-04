@@ -788,8 +788,8 @@ class PromptDataset(Dataset):
 
 
 def tokenize_prompt(tokenizer, prompt, text_encoder):
-    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder)
-    embeds = compel.build_conditioning_tensor(prompt)
+    compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False)
+    embeds = compel(prompt)
 
     return embeds
 
