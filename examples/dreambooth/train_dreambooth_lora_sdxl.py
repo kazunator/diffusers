@@ -789,7 +789,7 @@ class PromptDataset(Dataset):
 
 def tokenize_prompt(tokenizer, prompt, text_encoder):
     compel = Compel(tokenizer=tokenizer, text_encoder=text_encoder, truncate_long_prompts=False)
-    embeds = compel(prompt)
+    embeds = compel(prompt, output_hidden_states=True)
 
     return embeds
 
