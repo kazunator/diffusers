@@ -792,6 +792,7 @@ def tokenize_prompt(tokenizers, prompt, text_encoders):
                 returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, 
                 requires_pooled=[False, True],
                truncate_long_prompts=False)
+    
     embed, pooled = compel(prompt)
     return embed, pooled
 
