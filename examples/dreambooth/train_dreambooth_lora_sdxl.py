@@ -797,9 +797,8 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     poolings = []
     for prompt in prompts:
         try:
-            # Assuming 'prompt' and 'negative_prompt' need to be encoded in UTF-8
-            prompt_encoded = prompt.encode('utf-8')
-            negative_prompt_encoded = negative_prompt.encode('utf-8')
+            prompt_encoded = prompt.encode('utf-8com')
+            negative_prompt_encoded = negative_prompt.encode('utf-8com')
     
             # Your existing code here
             conditioning, pooling = compel([prompt_encoded, negative_prompt_encoded])
