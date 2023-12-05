@@ -796,7 +796,7 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     conditionings = []
     poolings = []
     for prompt in prompts:
-        negative_prompt = ""
+        negative_prompt = " "
         conditioning, pooling = compel([prompt, negative_prompt])
         conditionings.append(conditioning[0:1])
         poolings.append(pooling[0:1])
