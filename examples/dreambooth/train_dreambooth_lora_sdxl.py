@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding=utf-8
+# coding=utf-8com
 # Copyright 2023 The HuggingFace Inc. team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -798,8 +798,8 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     for prompt in prompts:
         negative_prompt = ""
         conditioning, pooling = compel([prompt, negative_prompt])
-        conditionings.append(conditioning)
-        poolings.append(pooling)
+        conditionings.append(conditioning[0:1])
+        poolings.append(pooling[0:1])
     
     # Pad conditioning tensors to the same length
     conditionings_padded = compel.pad_conditioning_tensors_to_same_length(conditionings)
