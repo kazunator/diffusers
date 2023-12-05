@@ -793,9 +793,20 @@ def tokenize_prompt(tokenizers, prompt, text_encoders):
                 requires_pooled=[False, True],
                truncate_long_prompts=False)
     
-    embed, pooled = compel(prompt)
-    embed = compel.pad_conditioning_tensors_to_same_length(embed)
-    return embed, pooled
+    conditionings = []
+    poolings = []
+    for prompt in prompts:
+        conditioning, pooling = compel_instance.build_conditioning_tensor(prompt)
+        conditionings.append(conditioning)
+        poolings.append(pooling)
+    
+    # Pad conditioning tensors to the same length
+    conditionings_padded = compel_instance.pad_conditioning_tensors_to_same_length(conditionings)
+    
+    # Concatenate the outputs
+    conditioning_concat = torch.cat(conditionings_padded, dim=0)
+    pooling_concat = torch.cat(poolings, dim=0)
+    return conditioning_concat, pooling_concat
 
 
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
