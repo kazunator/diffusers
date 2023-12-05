@@ -920,6 +920,7 @@ def main(args):
             ).repo_id
 
     # Load the tokenizers
+    device='cuda'
     pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
 
     tokenizer_one = pipeline.tokenizer
