@@ -796,12 +796,12 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     conditionings = []
     poolings = []
     for prompt in prompts:
-        conditioning, pooling = compel_instance.build_conditioning_tensor(prompt)
+        conditioning, pooling = compel.build_conditioning_tensor(prompt)
         conditionings.append(conditioning)
         poolings.append(pooling)
     
     # Pad conditioning tensors to the same length
-    conditionings_padded = compel_instance.pad_conditioning_tensors_to_same_length(conditionings)
+    conditionings_padded = compel.pad_conditioning_tensors_to_same_length(conditionings)
     
     # Concatenate the outputs
     conditioning_concat = torch.cat(conditionings_padded, dim=0)
