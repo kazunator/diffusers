@@ -41,6 +41,7 @@ from tqdm.auto import tqdm
 from transformers import AutoTokenizer, PretrainedConfig
 
 import diffusers
+from diffusers import DiffusionPipeline
 from diffusers import (
     AutoencoderKL,
     DDPMScheduler,
@@ -786,11 +787,13 @@ class PromptDataset(Dataset):
         return example
 
 def tokenize_prompt(tokenizers, prompts, text_encoders):
-    compel = Compel(tokenizer=[tokenizers[0], tokenizers[1]] , 
-                text_encoder=[text_encoders[0], text_encoders[1]], 
-                returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, 
-                requires_pooled=[False, True],
-               truncate_long_prompts=False)
+    compel = Compel(tokenizer=[tokenizers[0], tokenizers[1]] ,
+                    text_encoder=[text_encoders[0], text_encoders[1]],
+                    returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
+                    requires_pooled=[False, True],
+                   truncate_long_prompts=False)
+    
+
     
     conditionings = []
     poolings = []
@@ -917,19 +920,10 @@ def main(args):
             ).repo_id
 
     # Load the tokenizers
-    tokenizer_one = AutoTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path,
-        subfolder="tokenizer",
-        revision=args.revision,
-        use_fast=False,
-    )
-    tokenizer_two = AutoTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path,
-        subfolder="tokenizer_2",
-        revision=args.revision,
-        use_fast=False,
-    )
+    pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
 
+    tokenizer_one = pipeline.tokenizer
+    tokenizer_two = pipeline.tokenizer_2
     # import correct text encoder classes
     text_encoder_cls_one = import_model_class_from_model_name_or_path(
         args.pretrained_model_name_or_path, args.revision
@@ -940,12 +934,8 @@ def main(args):
 
     # Load scheduler and models
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
-    text_encoder_one = text_encoder_cls_one.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision, variant=args.variant
-    )
-    text_encoder_two = text_encoder_cls_two.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder_2", revision=args.revision, variant=args.variant
-    )
+    text_encoder_one = pipeline.text_encoder
+    text_encoder_two = pipeline.text_encoder_2
     vae_path = (
         args.pretrained_model_name_or_path
         if args.pretrained_vae_model_name_or_path is None
