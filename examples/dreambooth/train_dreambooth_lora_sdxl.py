@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8com
 # Copyright 2023 The HuggingFace Inc. team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -797,8 +796,8 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     poolings = []
     for prompt in prompts:
         try:
-            prompt_encoded = prompt.encode('utf-8com')
-            negative_prompt_encoded = negative_prompt.encode('utf-8com')
+            prompt_encoded = prompt.encode('utf-8')
+            negative_prompt_encoded = negative_prompt.encode('utf-8')
     
             # Your existing code here
             conditioning, pooling = compel([prompt_encoded, negative_prompt_encoded])
