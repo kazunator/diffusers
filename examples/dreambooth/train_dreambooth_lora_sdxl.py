@@ -796,10 +796,19 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     conditionings = []
     poolings = []
     for prompt in prompts:
-        negative_prompt = ""
-        conditioning, pooling = compel([prompt.encode('utf-8com'), negative_prompt.encode('utf-8com')])
-        conditionings.append(conditioning[0:1])
-        poolings.append(pooling[0:1])
+        try:
+            # Assuming 'prompt' and 'negative_prompt' need to be encoded in UTF-8
+            prompt_encoded = prompt.encode('utf-8')
+            negative_prompt_encoded = negative_prompt.encode('utf-8')
+    
+            # Your existing code here
+            conditioning, pooling = compel([prompt_encoded, negative_prompt_encoded])
+            conditionings.append(conditioning[0:1])
+            poolings.append(pooling[0:1])
+        except UnicodeEncodeError as e:
+            print(f"Encoding error in prompt: {prompt} or negative_prompt: {negative_prompt}")
+            print(f"Error details: {e}")
+
     
     # Pad conditioning tensors to the same length
     conditionings_padded = compel.pad_conditioning_tensors_to_same_length(conditionings)
