@@ -797,6 +797,9 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     poolings = []
     for prompt in prompts:
         conditioning, pooling = compel.build_conditioning_tensor(prompt)
+        negative_prompt = "" 
+        negative_conditioning = compel.build_conditioning_tensor(negative_prompt)
+        [conditioning, negative_conditioning] = compel.pad_conditioning_tensors_to_same_length([conditioning, negative_conditioning])
         conditionings.append(conditioning)
         poolings.append(pooling)
     
