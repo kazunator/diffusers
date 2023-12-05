@@ -794,6 +794,7 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     
     conditionings = []
     poolings = []
+    negative_prompt= ""
     for prompt in prompts:
         try:
             prompt_encoded = prompt.encode('utf-8')
