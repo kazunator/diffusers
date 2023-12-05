@@ -797,11 +797,11 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     negative_prompt= ""
     for prompt in prompts:
         try:
-            prompt_encoded = prompt.encode('utf-8')
-            negative_prompt_encoded = negative_prompt.encode('utf-8')
+            prompt_encoded = prompt
+            negative_prompt_encoded = negative_prompt
     
             # Your existing code here
-            conditioning, pooling = compel([prompt_encoded, negative_prompt_encoded])
+            conditioning, pooling = compel([prompt, negative_prompt])
             conditionings.append(conditioning[0:1])
             poolings.append(pooling[0:1])
         except UnicodeEncodeError as e:
