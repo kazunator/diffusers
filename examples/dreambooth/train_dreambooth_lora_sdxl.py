@@ -794,7 +794,7 @@ def tokenize_prompt(tokenizers, prompt, text_encoders):
                truncate_long_prompts=False)
     
     embed, pooled = compel(prompt)
-    embed = compel.pad_conditioning_tensors_to_same_length([embed, negative_conditioning])
+    embed = compel.pad_conditioning_tensors_to_same_length(embed)
     return embed, pooled
 
 
