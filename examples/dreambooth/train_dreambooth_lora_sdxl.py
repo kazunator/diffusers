@@ -816,9 +816,13 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
             if "Sizes of tensors must match except in dimension 1." in str(e):
                 print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
                 print("Mismatched tensor sizes. Ensure that all tensors in the list have the same size in all dimensions except the concatenation dimension.")
+            elif "mat1 and mat2 shapes cannot be multiplied" in str(e):
+                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                print("Matrix multiplication error. Check that the tensor shapes are compatible for the linear layer operation.")
             else:
                 print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
                 print(f"Error details: {e}")
+
 
     
     # Pad conditioning tensors to the same length
