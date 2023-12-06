@@ -807,9 +807,22 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
             conditioning, pooling = compel([prompt, negative_prompt])
             conditionings.append(conditioning[0:1])
             poolings.append(pooling[0:1])
+    
         except UnicodeEncodeError as e:
             print(f"Encoding error in prompt: {prompt} or negative_prompt: {negative_prompt}")
             print(f"Error details: {e}")
+    
+        except RuntimeError as e:
+            if "Sizes of tensors must match except in dimension 1." in str(e):
+                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                print("Mismatched tensor sizes. Ensure that all tensors in the list have the same size in all dimensions except the concatenation dimension.")
+            elif "mat1 and mat2 shapes cannot be multiplied" in str(e):
+                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                print("Matrix multiplication error. Check that the tensor shapes are compatible for the linear layer operation.")
+            else:
+                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                print(f"Error details: {e}")
+
 
 
     
