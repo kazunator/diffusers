@@ -1538,7 +1538,7 @@ def main(args):
                     # Add the prior loss to the instance loss.
                     loss = loss + args.prior_loss_weight * prior_loss
 
-                accelerator.backward(loss)
+                accelerator.backward(loss, retain_graph=True)
                 if accelerator.sync_gradients:
                     params_to_clip = (
                         itertools.chain(unet_lora_parameters, text_lora_parameters_one, text_lora_parameters_two)
