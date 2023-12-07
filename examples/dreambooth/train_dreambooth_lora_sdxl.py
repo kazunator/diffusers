@@ -1428,8 +1428,20 @@ def main(args):
                             prompts, text_encoders, tokenizers
                         )
                     else:
-                        tokens_one = tokenize_prompt(tokenizer_one, prompts, text_encoders)
-                        tokens_two = tokenize_prompt(tokenizer_two, prompts, text_encoders)
+                        #this should be a function, but I'm currently just putting here for my own sanity. Clean later.
+                        max_length_one = tokenizer_one.model_max_length
+                        max_length_two = tokenizer_two.model_max_length
+                        input_ids_one = tokenizer_one(prompt, return_tensors="pt").input_ids
+                        input_ids_two = tokenizer_two(prompt, return_tensors="pt").input_ids
+                        concat_embeds_one = []  
+                        concat_embeds_two = []
+                        for i in range(0, input_ids.shape[-1], max_length_one):
+                            concat_embeds_one.append(pipe.text_encoder(input_ids[:, i: i + max_length])[0])
+                        for i in range(0, input_ids.shape[-1], max_length_two):
+                            concat_embeds_two.append(pipe.text_encoder(input_ids[:, i: i + max_length])[0])
+                        
+                        tokens_one = torch.cat(concat_embeds_one, dim=1)
+                        tokens_two = torch.cat(concat_embeds_two, dim=1)
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
