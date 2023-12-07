@@ -1263,7 +1263,13 @@ def main(args):
 
         def compute_text_embeddings(prompt, text_encoders, tokenizers):
             with torch.no_grad():
-                prompt_embeds, pooled_prompt_embeds = encode_prompt(text_encoders, tokenizers, prompt)
+                device='cuda'
+                pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
+                tokenizer_one = pipeline.tokenizer
+                tokenizer_two = pipeline.tokenizer_2
+                text_encoder_one = pipeline.text_encoder
+                text_encoder_two = pipeline.text_encoder_2
+                prompt_embeds, pooled_prompt_embeds = encode_prompt([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
                 prompt_embeds = prompt_embeds.to(accelerator.device)
                 pooled_prompt_embeds = pooled_prompt_embeds.to(accelerator.device)
             return prompt_embeds, pooled_prompt_embeds
