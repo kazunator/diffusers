@@ -1540,9 +1540,19 @@ def main(args):
                         {"text_embeds": pooled_prompt_embeds.repeat(elems_to_repeat_text_embeds, 1)}
                     )
                     prompt_embeds_input = prompt_embeds.repeat(elems_to_repeat_text_embeds, 1, 1)
-                    model_pred = unet(
+                    try:
+                        model_pred = unet(
                         noisy_model_input, timesteps, prompt_embeds_input, added_cond_kwargs=unet_added_conditions
                     ).sample
+                    
+                    except RuntimeError as e:
+                        if "mat1 and mat2 shapes cannot be multiplied" in str(e):
+                            print(f"Matrix multiplication error with input shapes: {noisy_model_input.shape}, {prompt_embeds_input.shape}")
+                            print(f"Error details: {e}")
+                            # Handle the error, e.g., by skipping this batch or logging detailed information
+                        else:
+                            raise  # Re-raises the last exception
+                    
 
                 # Get the target for loss depending on the prediction type
                 if noise_scheduler.config.prediction_type == "epsilon":
