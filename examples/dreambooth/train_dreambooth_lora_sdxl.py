@@ -1443,8 +1443,8 @@ def main(args):
                         )
                     else:
                         #this should be a function, but I'm currently just putting here for my own sanity. Clean later                        
-                        tokens_one = compel1.build_conditioning_tensor(prompts)
-                        tokens_two = compel2.build_conditioning_tensor(prompts)
+                        tokens_one = compel1(prompts)
+                        tokens_two = compel2(prompts)
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
