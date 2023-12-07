@@ -1409,13 +1409,13 @@ def main(args):
     pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
     text_encoder_one = pipeline.text_encoder
     text_encoder_two = pipeline.text_encoder_2
-    compel1 = Compel(tokenizer=tokenizers[0] ,
-                    text_encoder=text_encoders[0],
+    compel1 = Compel(tokenizer=tokenizer_one ,
+                    text_encoder=text_encoder_one,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                     requires_pooled=[False, True],
                    truncate_long_prompts=False)
-    compel2 = Compel(tokenizer=tokenizers[1] ,
-                    text_encoder=text_encoders[1],
+    compel2 = Compel(tokenizer=tokenizer_twp ,
+                    text_encoder=text_encoder_two,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                     requires_pooled=[False, True],
                    truncate_long_prompts=False)
@@ -1442,14 +1442,7 @@ def main(args):
                             prompts, text_encoders, tokenizers
                         )
                     else:
-                        #this should be a function, but I'm currently just putting here for my own sanity. Clean later.
-                        max_length_one = tokenizer_one.model_max_length
-                        max_length_two = tokenizer_two.model_max_length
-                        input_ids_one = tokenizer_one(prompts, return_tensors="pt",  truncation=False).input_ids
-                        input_ids_two = tokenizer_two(prompts, return_tensors="pt", truncation=False).input_ids
-                        tokenize_prompt([tokenizer_one, tokenizer_one], prompts, [text_encoder_one, text_encoder_two])
-  
-                        
+                        #this should be a function, but I'm currently just putting here for my own sanity. Clean later                        
                         tokens_one = compel1.build_conditioning_tensor(prompts)
                         tokens_two = compel2.build_conditioning_tensor(prompts)
 
