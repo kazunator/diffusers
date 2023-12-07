@@ -1480,7 +1480,21 @@ def main(args):
                         #this should be a function, but I'm currently just putting here for my own sanity. Clean later                        
                         tokens_one = compel1(prompts)
                         tokens_two = compel2(prompts)
-                        prompt_embeds, pooled_prompt_embeds = compel(prompts)
+                        try:
+                            prompt_embeds, pooled_prompt_embeds = compel(prompts)
+                    
+                    
+                        except RuntimeError as e:
+                            if "Sizes of tensors must match except in dimension 1." in str(e):
+                                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                                print("Mismatched tensor sizes. Ensure that all tensors in the list have the same size in all dimensions except the concatenation dimension.")
+                            elif "mat1 and mat2 shapes cannot be multiplied" in str(e):
+                                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                                print("Matrix multiplication error. Check that the tensor shapes are compatible for the linear layer operation.")
+                            else:
+                                print(f"RuntimeError with prompt: '{prompt}' or negative_prompt: '{negative_prompt}'")
+                                print(f"Error details: {e}")
+                        
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
