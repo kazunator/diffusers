@@ -1428,8 +1428,8 @@ def main(args):
                             prompts, text_encoders, tokenizers
                         )
                     else:
-                        tokens_one = tokenize_prompt(tokenizer_one, prompts)
-                        tokens_two = tokenize_prompt(tokenizer_two, prompts)
+                        tokens_one = tokenize_prompt(tokenizer_one, prompts, text_encoders)
+                        tokens_two = tokenize_prompt(tokenizer_two, prompts, text_encoders)
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
