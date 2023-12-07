@@ -1441,6 +1441,11 @@ def main(args):
     pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
     text_encoder_one = pipeline.text_encoder
     text_encoder_two = pipeline.text_encoder_2
+    compel = Compel(tokenizer=[tokenizer_one, tokenizer_two],
+                    text_encoder= [text_encoder_one, text_encoder_two],
+                    returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
+                    requires_pooled=[False, True],
+                   truncate_long_prompts=False)
     compel1 = Compel(tokenizer=tokenizer_one ,
                     text_encoder=text_encoder_one,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
@@ -1473,8 +1478,9 @@ def main(args):
                         )
                     else:
                         #this should be a function, but I'm currently just putting here for my own sanity. Clean later                        
-                        tokens_one = compel1(prompts).input_ids
-                        tokens_two = compel2(prompts).input_ids
+                        tokens_one = compel1(prompts)
+                        tokens_two = compel2(prompts)
+                        prompt_embeds, pooled_prompt_embeds = compel(prompts)
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
@@ -1527,12 +1533,7 @@ def main(args):
                             raise  # Re-raises the last exception
                 else:
                     unet_added_conditions = {"time_ids": add_time_ids.repeat(elems_to_repeat_time_ids, 1)}
-                    prompt_embeds, pooled_prompt_embeds = encode_prompt1(
-                        text_encoders=[text_encoder_one, text_encoder_two],
-                        tokenizers=None,
-                        prompt=None,
-                        text_input_ids_list=[tokens_one, tokens_two],
-                    )
+                
                     unet_added_conditions.update(
                         {"text_embeds": pooled_prompt_embeds.repeat(elems_to_repeat_text_embeds, 1)}
                     )
