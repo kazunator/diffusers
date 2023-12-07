@@ -1405,6 +1405,20 @@ def main(args):
         # Only show the progress bar once on each machine.
         disable=not accelerator.is_local_main_process,
     )
+    device='cuda'
+    pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
+    text_encoder_one = pipeline.text_encoder
+    text_encoder_two = pipeline.text_encoder_2
+    compel1 = Compel(tokenizer=tokenizers[0] ,
+                    text_encoder=text_encoders[0],
+                    returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
+                    requires_pooled=[False, True],
+                   truncate_long_prompts=False)
+    compel2 = Compel(tokenizer=tokenizers[1] ,
+                    text_encoder=text_encoders[1],
+                    returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
+                    requires_pooled=[False, True],
+                   truncate_long_prompts=False)
 
     for epoch in range(first_epoch, args.num_train_epochs):
         unet.train()
@@ -1433,15 +1447,11 @@ def main(args):
                         max_length_two = tokenizer_two.model_max_length
                         input_ids_one = tokenizer_one(prompts, return_tensors="pt",  truncation=False).input_ids
                         input_ids_two = tokenizer_two(prompts, return_tensors="pt", truncation=False).input_ids
-                        concat_embeds_one = []  
-                        concat_embeds_two = []
-                        for i in range(0, input_ids.shape[-1], max_length_one):
-                            concat_embeds_one.append(pipe.text_encoder(input_ids[:, i: i + max_length])[0])
-                        for i in range(0, input_ids.shape[-1], max_length_two):
-                            concat_embeds_two.append(pipe.text_encoder(input_ids[:, i: i + max_length])[0])
+                        tokenize_prompt([tokenizer_one, tokenizer_one], prompts, [text_encoder_one, text_encoder_two])
+  
                         
-                        tokens_one = torch.cat(concat_embeds_one, dim=1)
-                        tokens_two = torch.cat(concat_embeds_two, dim=1)
+                        tokens_one = compel1.build_conditioning_tensor(prompts)
+                        tokens_two = compel2.build_conditioning_tensor(prompts)
 
                 # Convert images to latent space
                 model_input = vae.encode(pixel_values).latent_dist.sample()
