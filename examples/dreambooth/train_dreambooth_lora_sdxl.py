@@ -1431,8 +1431,8 @@ def main(args):
                         #this should be a function, but I'm currently just putting here for my own sanity. Clean later.
                         max_length_one = tokenizer_one.model_max_length
                         max_length_two = tokenizer_two.model_max_length
-                        input_ids_one = tokenizer_one(prompts, return_tensors="pt").input_ids
-                        input_ids_two = tokenizer_two(prompts, return_tensors="pt").input_ids
+                        input_ids_one = tokenizer_one(prompts, return_tensors="pt", , truncation=False).input_ids
+                        input_ids_two = tokenizer_two(prompts, return_tensors="pt", truncation=False).input_ids
                         concat_embeds_one = []  
                         concat_embeds_two = []
                         for i in range(0, input_ids.shape[-1], max_length_one):
