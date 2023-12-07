@@ -1295,7 +1295,7 @@ def main(args):
                 tokenizer_two = pipeline.tokenizer_2
                 text_encoder_one = pipeline.text_encoder
                 text_encoder_two = pipeline.text_encoder_2
-                prompt_embeds, pooled_prompt_embeds = encode_prompt1([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
+                prompt_embeds, pooled_prompt_embeds = encode_prompt([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
                 prompt_embeds = prompt_embeds.to(accelerator.device)
                 pooled_prompt_embeds = pooled_prompt_embeds.to(accelerator.device)
             return prompt_embeds, pooled_prompt_embeds
@@ -1527,7 +1527,7 @@ def main(args):
                             raise  # Re-raises the last exception
                 else:
                     unet_added_conditions = {"time_ids": add_time_ids.repeat(elems_to_repeat_time_ids, 1)}
-                    prompt_embeds, pooled_prompt_embeds = encode_prompt(
+                    prompt_embeds, pooled_prompt_embeds = encode_prompt1(
                         text_encoders=[text_encoder_one, text_encoder_two],
                         tokenizers=None,
                         prompt=None,
