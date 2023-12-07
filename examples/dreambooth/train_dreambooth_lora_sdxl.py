@@ -1414,7 +1414,7 @@ def main(args):
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                     requires_pooled=[False, True],
                    truncate_long_prompts=False)
-    compel2 = Compel(tokenizer=tokenizer_twp ,
+    compel2 = Compel(tokenizer=tokenizer_two ,
                     text_encoder=text_encoder_two,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                     requires_pooled=[False, True],
