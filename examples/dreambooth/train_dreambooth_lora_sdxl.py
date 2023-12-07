@@ -1412,12 +1412,10 @@ def main(args):
     compel1 = Compel(tokenizer=tokenizer_one ,
                     text_encoder=text_encoder_one,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
-                    requires_pooled=[False, True],
                    truncate_long_prompts=False)
     compel2 = Compel(tokenizer=tokenizer_two ,
                     text_encoder=text_encoder_two,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
-                    requires_pooled=[False, True],
                    truncate_long_prompts=False)
 
     for epoch in range(first_epoch, args.num_train_epochs):
