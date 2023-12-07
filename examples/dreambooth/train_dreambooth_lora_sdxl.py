@@ -834,7 +834,33 @@ def tokenize_prompt(tokenizers, prompts, text_encoders):
     pooling_concat = torch.cat(poolings, dim=0)
     return conditioning_concat, pooling_concat
 
+def encode_prompt1(text_encoders, tokenizers, prompt, text_input_ids_list=None):
+    prompt_embeds_list = []
 
+    for i, text_encoder in enumerate(text_encoders):
+        if tokenizers is not None:
+            tokenizer = tokenizers[i]
+            text_input_ids = tokenize_prompt(tokenizer, prompt)
+        else:
+            assert text_input_ids_list is not None
+            text_input_ids = text_input_ids_list[i]
+
+        prompt_embeds = text_encoder(
+            text_input_ids.to(text_encoder.device),
+            output_hidden_states=True,
+        )
+
+        # We are only ALWAYS interested in the pooled output of the final text encoder
+        pooled_prompt_embeds = prompt_embeds[0]
+        prompt_embeds = prompt_embeds.hidden_states[-2]
+        bs_embed, seq_len, _ = prompt_embeds.shape
+        prompt_embeds = prompt_embeds.view(bs_embed, seq_len, -1)
+        prompt_embeds_list.append(prompt_embeds)
+
+    prompt_embeds = torch.concat(prompt_embeds_list, dim=-1)
+    pooled_prompt_embeds = pooled_prompt_embeds.view(bs_embed, -1)
+    return prompt_embeds, pooled_prompt_embeds
+    
 # Adapted from pipelines.StableDiffusionXLPipeline.encode_prompt
 def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None):
     
@@ -1269,7 +1295,7 @@ def main(args):
                 tokenizer_two = pipeline.tokenizer_2
                 text_encoder_one = pipeline.text_encoder
                 text_encoder_two = pipeline.text_encoder_2
-                prompt_embeds, pooled_prompt_embeds = encode_prompt([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
+                prompt_embeds, pooled_prompt_embeds = encode_prompt1([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
                 prompt_embeds = prompt_embeds.to(accelerator.device)
                 pooled_prompt_embeds = pooled_prompt_embeds.to(accelerator.device)
             return prompt_embeds, pooled_prompt_embeds
