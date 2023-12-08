@@ -71,6 +71,12 @@ def text_encoder_lora_state_dict(text_encoder):
         from transformers import CLIPTextModel, CLIPTextModelWithProjection
 
         attn_modules = []
+        for name, mod in attn_modules:
+            print(f"Checking module: {name}")
+            if hasattr(mod.q_proj, 'lora_linear_layer'):
+                print(f"LoRA layer found in {name}.q_proj")
+            else:
+                print(f"No LoRA layer in {name}.q_proj")
 
         if isinstance(text_encoder, (CLIPTextModel, CLIPTextModelWithProjection)):
             for i, layer in enumerate(text_encoder.text_model.encoder.layers):
@@ -1730,6 +1736,12 @@ def main(args):
         unet_lora_layers = unet_lora_state_dict(unet)
 
         if args.train_text_encoder:
+            for name, mod in attn_modules:
+                print(f"Checking module: {name}")
+                if hasattr(mod.q_proj, 'lora_linear_layer'):
+                    print(f"LoRA layer found in {name}.q_proj")
+                else:
+                    print(f"No LoRA layer in {name}.q_proj")
             text_encoder_one = accelerator.unwrap_model(text_encoder_one)
             text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder_one.to(torch.float32))
             text_encoder_two = accelerator.unwrap_model(text_encoder_two)
