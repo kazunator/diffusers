@@ -71,7 +71,7 @@ def text_encoder_lora_state_dict(text_encoder):
         from transformers import CLIPTextModel, CLIPTextModelWithProjection
 
         attn_modules = []
-        for name, mod in attn_modules:
+        for name, mod in attn_module:
             print(f"Checking module: {name}")
             if hasattr(mod.q_proj, 'lora_linear_layer'):
                 print(f"LoRA layer found in {name}.q_proj")
