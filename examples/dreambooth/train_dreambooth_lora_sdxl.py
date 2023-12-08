@@ -1291,11 +1291,11 @@ def main(args):
             with torch.no_grad():
                 device='cuda'
                 pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
-                tokenizer_one = pipeline.tokenizer
-                tokenizer_two = pipeline.tokenizer_2
-                text_encoder_one = pipeline.text_encoder
-                text_encoder_two = pipeline.text_encoder_2
-                prompt_embeds, pooled_prompt_embeds = encode_prompt([text_encoder_one, text_encoder_two], [tokenizer_one, tokenizer_two], prompt)
+                tokenizer_uno = pipeline.tokenizer
+                tokenizer_dos = pipeline.tokenizer_2
+                text_encoder_uno = pipeline.text_encoder
+                text_encoder_dos = pipeline.text_encoder_2
+                prompt_embeds, pooled_prompt_embeds = encode_prompt([text_encoder_uno, text_encoder_dos], [tokenizer_uno, tokenizer_dos], prompt)
                 prompt_embeds = prompt_embeds.to(accelerator.device)
                 pooled_prompt_embeds = pooled_prompt_embeds.to(accelerator.device)
             return prompt_embeds, pooled_prompt_embeds
@@ -1439,19 +1439,19 @@ def main(args):
     )
     device='cuda'
     pipeline = DiffusionPipeline.from_pretrained(args.pretrained_model_name_or_path, variant="fp16", use_safetensors=True, torch_dtype=torch.float16).to(device)
-    text_encoder_one = pipeline.text_encoder
-    text_encoder_two = pipeline.text_encoder_2
+    text_encoder_uno = pipeline.text_encoder
+    text_encoder_dos = pipeline.text_encoder_2
     compel = Compel(tokenizer=[tokenizer_one, tokenizer_two],
-                    text_encoder= [text_encoder_one, text_encoder_two],
+                    text_encoder= [text_encoder_uno, text_encoder_dos],
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                     requires_pooled=[False, True],
                    truncate_long_prompts=False)
     compel1 = Compel(tokenizer=tokenizer_one ,
-                    text_encoder=text_encoder_one,
+                    text_encoder=text_encoder_uno,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                    truncate_long_prompts=False)
     compel2 = Compel(tokenizer=tokenizer_two ,
-                    text_encoder=text_encoder_two,
+                    text_encoder=text_encoder_dos,
                     returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED,
                    truncate_long_prompts=False)
 
