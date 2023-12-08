@@ -1736,7 +1736,7 @@ def main(args):
         unet_lora_layers = unet_lora_state_dict(unet)
 
         if args.train_text_encoder:
-            for name, mod in attn_modules:
+            for name, mod in attn_module:
                 print(f"Checking module: {name}")
                 if hasattr(mod.q_proj, 'lora_linear_layer'):
                     print(f"LoRA layer found in {name}.q_proj")
